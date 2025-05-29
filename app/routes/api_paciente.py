@@ -32,31 +32,48 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
-# ✅ Ruta de login (email + password)
 @api_paciente_bp.route('/login', methods=['POST'])
 def login_paciente():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No se recibió JSON válido'}), 400
 
-    user = User.query.filter_by(email=email).first()
-    if not user or not check_password_hash(user.password, password) or not user.paciente:
-        return jsonify({'error': 'Credenciales inválidas'}), 401
+        email = data.get('email')
+        password = data.get('password')
 
-    payload = {
-        'user_id': user.id,
-        'exp': datetime.utcnow() + timedelta(hours=24)
-    }
-    token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
+        if not email or not password:
+            return jsonify({'error': 'Faltan datos'}), 400
 
-    return jsonify({
-        'token': token,
-        'user': {
-            'id': user.id,
-            'name': user.name,
-            'email': user.email
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'error': 'Usuario no encontrado'}), 401
+
+        if not check_password_hash(user.password, password):
+            return jsonify({'error': 'Contraseña incorrecta'}), 401
+
+        if not hasattr(user, 'paciente') or not user.paciente:
+            return jsonify({'error': 'El usuario no es un paciente'}), 401
+
+        payload = {
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=24)
         }
-    })
+        token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({
+            'token': token,
+            'user': {
+                'id': user.id,
+                'name': user.name,
+                'email': user.email
+            }
+        })
+
+    except Exception as e:
+        current_app.logger.error(f"Error en login_paciente: {e}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
 
 # 📄 Ver perfil del paciente
 @api_paciente_bp.route('/perfil', methods=['GET'])
