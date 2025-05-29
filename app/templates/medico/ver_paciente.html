@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Ver Paciente{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Perfil del Paciente</h2>
+        <p class="text-gray-500">Consulta su historial médico y asigna nuevos tratamientos</p>
+    </div>
+    <a href="{{ url_for('medico.generar_pdf', paciente_id=paciente.id) }}"
+       class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+        Descargar PDF
+    </a>
+</div>
+
+<!-- Datos del paciente -->
+<div class="bg-white p-6 rounded-lg shadow mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-blue-600">Información personal</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <p><strong>Nombre:</strong> {{ paciente.user.name }}</p>
+        <p><strong>Correo:</strong> {{ paciente.user.email }}</p>
+        <p><strong>Teléfono:</strong> {{ paciente.telefono or '—' }}</p>
+        <p><strong>Domicilio:</strong> {{ paciente.domicilio or '—' }}</p>
+    </div>
+</div>
+
+<!-- Asignar nuevo medicamento -->
+<div class="bg-white p-6 rounded-lg shadow mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-blue-600">Asignar nuevo medicamento</h3>
+    <form method="POST" action="{{ url_for('medico.asignar_medicamento', paciente_id=paciente.id) }}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" name="nombre" placeholder="Nombre del medicamento" required class="px-4 py-2 border rounded-md">
+            <input type="text" name="ingrediente" placeholder="Ingrediente activo" required class="px-4 py-2 border rounded-md">
+            <input type="date" name="fecha_caducidad" class="px-4 py-2 border rounded-md">
+            <input type="datetime-local" name="hora" class="px-4 py-2 border rounded-md">
+        </div>
+        <button type="submit" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+            Asignar medicamento
+        </button>
+    </form>
+</div>
+
+<!-- Historial de tomas -->
+<div class="bg-white p-6 rounded-lg shadow mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-blue-600">Historial de Medicación</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left text-gray-700">
+            <thead class="bg-gray-100 text-xs uppercase">
+                <tr>
+                    <th class="px-6 py-3">Medicamento</th>
+                    <th class="px-6 py-3">Fecha</th>
+                    <th class="px-6 py-3">Hora</th>
+                    <th class="px-6 py-3">¿Tomado?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for toma in tomas %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ toma.medicamento.nombre }}</td>
+                    <td class="px-6 py-4">{{ toma.fecha.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4">{{ toma.hora.strftime('%H:%M') }}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-block px-2 py-1 rounded-full text-white text-xs {{ 'bg-green-600' if toma.fue_tomado else 'bg-red-600' }}">
+                            {{ 'Sí' if toma.fue_tomado else 'No' }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Signos vitales -->
+<div class="bg-white p-6 rounded-lg shadow">
+    <h3 class="text-lg font-semibold mb-4 text-blue-600">Signos Vitales</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left text-gray-700">
+            <thead class="bg-gray-100 text-xs uppercase">
+                <tr>
+                    <th class="px-6 py-3">Tipo</th>
+                    <th class="px-6 py-3">Valor</th>
+                    <th class="px-6 py-3">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signo in signos %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ signo.tipo }}</td>
+                    <td class="px-6 py-4">{{ signo.valor }}</td>
+                    <td class="px-6 py-4">{{ signo.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

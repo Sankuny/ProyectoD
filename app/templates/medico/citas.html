@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Citas Médicas{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Citas Médicas</h2>
+    <a href="{{ url_for('medico.nueva_cita') }}"
+       class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4v16m8-8H4" />
+        </svg>
+        Nueva Cita
+    </a>
+</div>
+
+
+<div class="overflow-x-auto bg-white rounded-lg shadow-md">
+    <table class="min-w-full text-sm text-left text-gray-700">
+        <thead class="bg-gray-100 text-xs uppercase">
+            <tr>
+                <th class="px-6 py-3">Paciente</th>
+                <th class="px-6 py-3">Especialidad</th>
+                <th class="px-6 py-3">Fecha</th>
+                <th class="px-6 py-3">Hora</th>
+                <th class="px-6 py-3">Doctor</th>
+                <th class="px-6 py-3">Diagnóstico</th>
+                <th class="px-6 py-3">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cita in citas %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-6 py-4">{{ cita.paciente.user.name }}</td>
+                <td class="px-6 py-4">{{ cita.especialidad }}</td>
+                <td class="px-6 py-4">{{ cita.fecha.strftime('%Y-%m-%d') }}</td>
+                <td class="px-6 py-4">{{ cita.hora.strftime('%H:%M') }}</td>
+                <td class="px-6 py-4">{{ cita.doctor.name }}</td>
+                <td class="px-6 py-4">{{ cita.diagnostico or '—' }}</td>
+                <td class="px-6 py-4">
+                    <a href="#" class="text-blue-600 hover:underline">Editar</a> |
+                    <a href="#" class="text-red-600 hover:underline">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

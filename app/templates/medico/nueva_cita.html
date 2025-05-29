@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Cita{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-4">Crear Nueva Cita</h2>
+    <form method="POST" action="{{ url_for('medico.nueva_cita') }}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-semibold mb-1">Paciente</label>
+                <select name="paciente_id" required class="w-full border px-4 py-2 rounded-md">
+                    <option value="">Selecciona un paciente</option>
+                    {% for paciente in pacientes %}
+                        <option value="{{ paciente.id }}">{{ paciente.user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Especialidad</label>
+                <input type="text" name="especialidad" required placeholder="Ej. Medicina General"
+                       class="w-full border px-4 py-2 rounded-md">
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Nombre del Doctor</label>
+                <input type="text" name="doctor" required placeholder="Dr. Juan Pérez"
+                       class="w-full border px-4 py-2 rounded-md">
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Fecha</label>
+                <input type="date" name="fecha" required class="w-full border px-4 py-2 rounded-md">
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Hora</label>
+                <input type="time" name="hora" required class="w-full border px-4 py-2 rounded-md">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block font-semibold mb-1">Diagnóstico</label>
+                <textarea name="diagnostico" rows="4" placeholder="Opcional"
+                          class="w-full border px-4 py-2 rounded-md resize-none"></textarea>
+            </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+            <a href="{{ url_for('medico.citas') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-400">Cancelar</a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Guardar Cita</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
